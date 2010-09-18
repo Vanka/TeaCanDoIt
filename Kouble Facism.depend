@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1272971023 source:c:\projects\kouble facism\main.c
+	<SDL/SDL.h>
+	<stdio.h>
+	<string.h>
+
+1284557476 source:c:\projects\kouble facism (2)\main.c
+	<SDL/SDL.h>
+	<stdio.h>
+	<string.h>
+
