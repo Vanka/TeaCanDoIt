@@ -61,6 +61,6 @@ int main (int argc, char* args[])
     SDL_Delay (10000);
     SDL_FreeSurface (message);
     SDL_FreeSurface (background);
-    SDL_Quit ();
+    SDL_Quit();
     return 0;
 }
