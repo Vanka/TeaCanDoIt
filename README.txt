@@ -1,6 +1,7 @@
-Так вот. Что бы я хотел написать. Во-первых, картинки лежат в data/img (нетрудно догадаться). Если хотите, можете перерисовать, дорисовать и так далее).
-В данный момент на экране может находиться только одна пуля. Можете попробовать решить эту проблему. 
-Дима - делаешь работу с текстовыми файлами (сохранение результатов, вывод лучших результатов)
-Никита - делаешь меню, заставку.
-Мирослав - учишь сеть, параллельно можешь помогать мне с алгоритмами. 
-А я ничего не делаю. Да, я молодец. )
+So. Firstly, images are in 'data/img', and used font is in 'data'. If you want, you can repaint, add some elements, etc.
+Only one bullet can be on screen in one moment. Ask you to fix it.
+What you have to do:
+Dima - working with text files (saving results, output the best results)
+Nikita - menu, intro.
+Miroslav - net.
+Me - doing nothing.I'm the best. ))
