@@ -82,6 +82,8 @@ int main( int argc, char* args[] )
     int dx = SCREEN_WIDTH/2; /*Координата x точки*/
     int dy = SCREEN_HEIGHT/2; /*Координата y точки*/
     int bx,by; /*Координаты пули*/
+    int mx,my; /*Координаты курсора*/
+    int mox,moy, xVel, yVel;
     int quit = 0;
     Uint8 *keystates = SDL_GetKeyState(NULL);
     if (init()!=1)
@@ -96,13 +98,25 @@ int main( int argc, char* args[] )
                 quit = 1;
             if (event.type == SDL_KEYDOWN)
             {
-                if (event.key.keysym.sym == SDLK_SPACE)
-                {
-                    bx=dx + (dot->w)/2;
-                    by=dy - (dot->h)/2;
-                }
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                     quit = 1;
+            }
+            if (event.type == SDL_MOUSEMOTION)
+            {
+                mx = event.motion.x;
+                my = event.motion.y;
+            }
+            if (event.type == SDL_MOUSEBUTTONDOWN)
+            {
+                if (event.button.button == SDL_BUTTON_LEFT)
+                {
+                    bx = dx + (dot->w)/2;
+                    by = dy - (dot->h)/2;
+                    mox = mx;
+                    moy = my;
+                    xVel = (mox-bx)/25;
+                    yVel = (moy-by)/25;
+                }
             }
         }
         if ((keystates[SDLK_UP]) || (keystates[SDLK_w]))
@@ -129,7 +143,8 @@ int main( int argc, char* args[] )
         {
             dy = SCREEN_HEIGHT - dot->h;
         }
-        by-= 5;
+        bx+=xVel;
+        by+=yVel;
         apply_surface (0, 0, background, screen);
         apply_surface (dx, dy, dot, screen);
         apply_surface (bx, by, bullet, screen);
