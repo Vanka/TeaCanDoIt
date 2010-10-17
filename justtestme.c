@@ -52,6 +52,7 @@ int init ()
     if (TTF_Init() == -1)
         return 0;
     SDL_WM_SetCaption ("Not a game yet! ;-)", NULL);
+    SDL_WM_SetIcon (Load_Image ("data/img/icon.bmp"), NULL);
     return 1;
 }
 
@@ -100,15 +101,17 @@ int main( int argc, char* args[] )
                     bx=dx + (dot->w)/2;
                     by=dy - (dot->h)/2;
                 }
+                if (event.key.keysym.sym == SDLK_ESCAPE)
+                    quit = 1;
             }
         }
-        if (keystates[SDLK_UP])
+        if ((keystates[SDLK_UP]) || (keystates[SDLK_w]))
             dy -= 3;
-        if (keystates[SDLK_DOWN])
+        if ((keystates[SDLK_DOWN]) || (keystates[SDLK_s]))
             dy += 3;
-        if (keystates[SDLK_LEFT])
+        if ((keystates[SDLK_LEFT]) || (keystates[SDLK_a]))
             dx -= 3;
-        if (keystates[SDLK_RIGHT])
+        if ((keystates[SDLK_RIGHT]) || (keystates[SDLK_d]))
             dx += 3;
         if ( dx <= 0 )
         {
