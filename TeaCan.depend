@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1287564232 source:c:\teacan\justtestme.c
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+	<stdio.h>
+	"SDL/SDL_ttf.h"
+	"SDL/SDL_mixer.h"
+

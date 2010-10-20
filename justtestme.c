@@ -51,7 +51,7 @@ int init ()
         return 0;
     if (TTF_Init() == -1)
         return 0;
-    SDL_WM_SetCaption ("Not a game yet! ;-)", NULL);
+    SDL_WM_SetCaption (">_<", "data/img/icon.bmp");
     SDL_WM_SetIcon (Load_Image ("data/img/icon.bmp"), NULL);
     return 1;
 }
@@ -62,7 +62,7 @@ int load_files ()
     dot = Load_Image ("data/img/dot.png");
     bullet = Load_Image ("data/img/bullet.png");
     font = TTF_OpenFont ("data/acquestscript.ttf", 36);
-    if ((background == NULL) || (font == NULL))
+    if (background == NULL)
         return 0;
     return 1;
 }
@@ -83,7 +83,7 @@ int main( int argc, char* args[] )
     int dy = SCREEN_HEIGHT/2; /*Координата y точки*/
     int bx,by; /*Координаты пули*/
     int mx,my; /*Координаты курсора*/
-    int mox,moy, xVel, yVel;
+    int xVel, yVel;
     int quit = 0;
     Uint8 *keystates = SDL_GetKeyState(NULL);
     if (init()!=1)
@@ -111,11 +111,9 @@ int main( int argc, char* args[] )
                 if (event.button.button == SDL_BUTTON_LEFT)
                 {
                     bx = dx + (dot->w)/2;
-                    by = dy - (dot->h)/2;
-                    mox = mx;
-                    moy = my;
-                    xVel = (mox-bx)/25;
-                    yVel = (moy-by)/25;
+                    by = dy + (dot->h)/2;
+                    xVel = (mx-bx)/30;
+                    yVel = (my-by)/30;
                 }
             }
         }
