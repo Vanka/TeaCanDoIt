@@ -4,6 +4,8 @@
 #include "SDL/SDL_ttf.h"
 #include "SDL/SDL_mixer.h"
 
+#define FRAMES_PER_SECOND 40
+
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
@@ -51,7 +53,7 @@ int init ()
         return 0;
     if (TTF_Init() == -1)
         return 0;
-    SDL_WM_SetCaption ("Not a game yet! ;-)", NULL);
+    SDL_WM_SetCaption (">_<", "data/img/icon.bmp");
     SDL_WM_SetIcon (Load_Image ("data/img/icon.bmp"), NULL);
     return 1;
 }
@@ -62,7 +64,7 @@ int load_files ()
     dot = Load_Image ("data/img/dot.png");
     bullet = Load_Image ("data/img/bullet.png");
     font = TTF_OpenFont ("data/acquestscript.ttf", 36);
-    if ((background == NULL) || (font == NULL))
+    if (background == NULL)
         return 0;
     return 1;
 }
@@ -79,11 +81,14 @@ void clean_up ()
 
 int main( int argc, char* args[] )
 {
+    int cap = 1;
+    Uint32 start=SDL_GetTicks();
     int dx = SCREEN_WIDTH/2; /*Координата x точки*/
     int dy = SCREEN_HEIGHT/2; /*Координата y точки*/
     int bx,by; /*Координаты пули*/
     int mx,my; /*Координаты курсора*/
-    int mox,moy, xVel, yVel;
+    int xVel, yVel;
+    int kVel, b;
     int quit = 0;
     Uint8 *keystates = SDL_GetKeyState(NULL);
     if (init()!=1)
@@ -92,6 +97,7 @@ int main( int argc, char* args[] )
         return 1;
     while (quit == 0)
     {
+        start = SDL_GetTicks();
         while (SDL_PollEvent (&event))
         {
             if (event.type == SDL_QUIT)
@@ -111,22 +117,21 @@ int main( int argc, char* args[] )
                 if (event.button.button == SDL_BUTTON_LEFT)
                 {
                     bx = dx + (dot->w)/2;
-                    by = dy - (dot->h)/2;
-                    mox = mx;
-                    moy = my;
-                    xVel = (mox-bx)/25;
-                    yVel = (moy-by)/25;
+                    by = dy + (dot->h)/2;;
+                    kVel=sqrt(mx*mx + my*my)/10;
+                    xVel = (mx-bx)/kVel;
+                    yVel = (my-by)/kVel;
                 }
             }
         }
         if ((keystates[SDLK_UP]) || (keystates[SDLK_w]))
-            dy -= 3;
+            dy -= 5;
         if ((keystates[SDLK_DOWN]) || (keystates[SDLK_s]))
-            dy += 3;
+            dy += 5;
         if ((keystates[SDLK_LEFT]) || (keystates[SDLK_a]))
-            dx -= 3;
+            dx -= 5;
         if ((keystates[SDLK_RIGHT]) || (keystates[SDLK_d]))
-            dx += 3;
+            dx += 5;
         if ( dx <= 0 )
         {
             dx = 0;
@@ -142,6 +147,12 @@ int main( int argc, char* args[] )
         if ( dy >= SCREEN_HEIGHT - dot->h)
         {
             dy = SCREEN_HEIGHT - dot->h;
+        }
+        //If we want to cap the frame rate
+        if( (cap == 1) && ((SDL_GetTicks()-start) < 1000 / FRAMES_PER_SECOND ))
+        {
+            //Sleep the remaining frame time
+            SDL_Delay( ( 1000 / FRAMES_PER_SECOND ) - (SDL_GetTicks()-start) );
         }
         bx+=xVel;
         by+=yVel;
