@@ -88,7 +88,10 @@ int main( int argc, char* args[] )
     int bx,by; /*Координаты пули*/
     int mx,my; /*Координаты курсора*/
     int xVel, yVel;
+<<<<<<< HEAD
     int kVel, b;
+=======
+>>>>>>> origin/master
     int quit = 0;
     Uint8 *keystates = SDL_GetKeyState(NULL);
     if (init()!=1)
@@ -117,10 +120,16 @@ int main( int argc, char* args[] )
                 if (event.button.button == SDL_BUTTON_LEFT)
                 {
                     bx = dx + (dot->w)/2;
+<<<<<<< HEAD
                     by = dy + (dot->h)/2;;
                     kVel=sqrt(mx*mx + my*my)/10;
                     xVel = (mx-bx)/kVel;
                     yVel = (my-by)/kVel;
+=======
+                    by = dy + (dot->h)/2;
+                    xVel = (mx-bx)/30;
+                    yVel = (my-by)/30;
+>>>>>>> origin/master
                 }
             }
         }

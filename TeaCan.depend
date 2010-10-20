@@ -1,5 +1,9 @@
 # depslib dependency file v1.0
+<<<<<<< HEAD
 1287572646 source:c:\teacan\justtestme.c
+=======
+1287564232 source:c:\teacan\justtestme.c
+>>>>>>> origin/master
 	"SDL/SDL.h"
 	"SDL/SDL_image.h"
 	<stdio.h>
