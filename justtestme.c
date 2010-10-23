@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "SDL/SDL_ttf.h"
 #include "SDL/SDL_mixer.h"
+#include <math.h>
 
 #define FRAMES_PER_SECOND 40
 
@@ -10,6 +11,7 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
+SDL_Rect clip;
 SDL_Surface *background=NULL;
 SDL_Surface *dot=NULL;
 SDL_Surface *screen=NULL;
@@ -36,12 +38,12 @@ SDL_Surface *Load_Image (char *filename)
     return Optimized_Image;
 }
 
-void apply_surface (int x, int y, SDL_Surface *source, SDL_Surface *destination)
+void apply_surface (int x, int y, SDL_Surface *source, SDL_Surface *destination, SDL_Rect *clip)
 {
     SDL_Rect offset;
     offset.x = x;
     offset.y = y;
-    SDL_BlitSurface (source, NULL, destination, &offset);
+    SDL_BlitSurface (source, clip, destination, &offset);
 }
 
 int init ()
@@ -68,7 +70,13 @@ int load_files ()
         return 0;
     return 1;
 }
-
+void set_clip()
+{
+    clip.x=0;
+    clip.y=0;
+    clip.h=8;
+    clip.w=8;
+}
 void clean_up ()
 {
     SDL_FreeSurface (background);
@@ -81,17 +89,15 @@ void clean_up ()
 
 int main( int argc, char* args[] )
 {
-    int cap = 1;
-    Uint32 start=SDL_GetTicks();
     int dx = SCREEN_WIDTH/2; /*Координата x точки*/
     int dy = SCREEN_HEIGHT/2; /*Координата y точки*/
-    int bx,by; /*Координаты пули*/
-    int mx,my; /*Координаты курсора*/
-    int xVel, yVel;
-<<<<<<< HEAD
-    int kVel, b;
-=======
->>>>>>> origin/master
+    float bx,by; /*Координаты пули*/
+    float mx,my; /*Координаты курсора*/
+    float xVel, yVel;
+    float kVel, b;
+    int k=0;
+    float sin,cos;
+    set_clip();
     int quit = 0;
     Uint8 *keystates = SDL_GetKeyState(NULL);
     if (init()!=1)
@@ -100,7 +106,6 @@ int main( int argc, char* args[] )
         return 1;
     while (quit == 0)
     {
-        start = SDL_GetTicks();
         while (SDL_PollEvent (&event))
         {
             if (event.type == SDL_QUIT)
@@ -119,28 +124,29 @@ int main( int argc, char* args[] )
             {
                 if (event.button.button == SDL_BUTTON_LEFT)
                 {
-                    bx = dx + (dot->w)/2;
-<<<<<<< HEAD
-                    by = dy + (dot->h)/2;;
-                    kVel=sqrt(mx*mx + my*my)/10;
-                    xVel = (mx-bx)/kVel;
-                    yVel = (my-by)/kVel;
-=======
-                    by = dy + (dot->h)/2;
-                    xVel = (mx-bx)/30;
-                    yVel = (my-by)/30;
->>>>>>> origin/master
+                    if (k==0)
+                    {
+                        bx = dx + (dot->w)/2;
+                        by = dy + (dot->h)/2;;
+                        b=mx*mx + my*my;
+                        kVel=sqrt (b);
+                        sin=(my-by)/kVel;
+                        cos=(mx-bx)/kVel;
+                        yVel=sin*3;
+                        xVel=cos*3;
+                        k=1;
+                    }
                 }
             }
         }
         if ((keystates[SDLK_UP]) || (keystates[SDLK_w]))
-            dy -= 5;
+            dy -= 3;
         if ((keystates[SDLK_DOWN]) || (keystates[SDLK_s]))
-            dy += 5;
+            dy += 3;
         if ((keystates[SDLK_LEFT]) || (keystates[SDLK_a]))
-            dx -= 5;
+            dx -= 3;
         if ((keystates[SDLK_RIGHT]) || (keystates[SDLK_d]))
-            dx += 5;
+            dx += 3;
         if ( dx <= 0 )
         {
             dx = 0;
@@ -157,17 +163,13 @@ int main( int argc, char* args[] )
         {
             dy = SCREEN_HEIGHT - dot->h;
         }
-        //If we want to cap the frame rate
-        if( (cap == 1) && ((SDL_GetTicks()-start) < 1000 / FRAMES_PER_SECOND ))
-        {
-            //Sleep the remaining frame time
-            SDL_Delay( ( 1000 / FRAMES_PER_SECOND ) - (SDL_GetTicks()-start) );
-        }
         bx+=xVel;
         by+=yVel;
-        apply_surface (0, 0, background, screen);
-        apply_surface (dx, dy, dot, screen);
-        apply_surface (bx, by, bullet, screen);
+        if ((bx>=SCREEN_WIDTH) || (bx <= 0 - bullet->w) || (by >= SCREEN_HEIGHT) || (by <= 0 - bullet->h))
+            k=0;
+        apply_surface (0, 0, background, screen, NULL);
+        apply_surface (dx, dy, dot, screen, NULL);
+        apply_surface (bx, by, bullet, screen, NULL);
         SDL_Flip (screen);
     }
     clean_up();
