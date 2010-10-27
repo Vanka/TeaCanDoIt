@@ -5,19 +5,23 @@
 #include "SDL/SDL_mixer.h"
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
-#define FRAMES_PER_SECOND 60
+#define FRAMES_PER_SECOND 100
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
-SDL_Rect clip [3];
 SDL_Surface *background=NULL;
 SDL_Surface *dot=NULL;
 SDL_Surface *temp=NULL;
 SDL_Surface *screen=NULL;
 SDL_Surface *bullet=NULL;
+SDL_Surface *empty;
+SDL_Rect clip_bul;
+SDL_Rect clip_ene [4];
+SDL_Rect clip_dot;
 SDL_Surface *enemy1=NULL;
 SDL_Surface *enemy2=NULL;
 SDL_Surface *enemy3=NULL;
@@ -52,6 +56,50 @@ void apply_surface (int x, int y, SDL_Surface *source, SDL_Surface *destination,
     SDL_BlitSurface (source, clip, destination, &offset);
 }
 
+int check_collision(SDL_Surface *A, SDL_Surface *B, int Ax, int Ay, int Bx, int By)
+{
+    //The sides of the rectangles
+    int leftA, leftB;
+    int rightA, rightB;
+    int topA, topB;
+    int bottomA, bottomB;
+
+    //Calculate the sides of rect A
+    leftA = Ax;
+    rightA = Ax + A->w;
+    topA = Ay;
+    bottomA = Ay + A->h;
+
+    //Calculate the sides of rect B
+    leftB = Bx;
+    rightB = Bx + B->w;
+    topB = By;
+    bottomB = By + B->h;
+
+    if( bottomA <= topB )
+    {
+        return 0;
+    }
+
+    if( topA >= bottomB )
+    {
+        return 0;
+    }
+
+    if( rightA <= leftB )
+    {
+        return 0;
+    }
+
+    if( leftA >= rightB )
+    {
+        return 0;
+    }
+
+    //If none of the sides from A are outside B
+    return 1;
+}
+
 int init ()
 {
     if (SDL_Init (SDL_INIT_EVERYTHING) == -1)
@@ -75,12 +123,16 @@ int load_files ()
     enemy2 = Load_Image ("data/img/enemy2.png");
     enemy3 = Load_Image ("data/img/enemy3.png");
     enemy3 = Load_Image ("data/img/enemy4.png");
+    empty = Load_Image ("data/img/empty.png");
     font = TTF_OpenFont ("data/acquestscript.ttf", 36);
     if (background == NULL)
         return 0;
     return 1;
 }
 
+void set_clips()
+{
+}
 void clean_up ()
 {
     SDL_FreeSurface (background);
@@ -91,16 +143,10 @@ void clean_up ()
     SDL_FreeSurface (enemy3);
     SDL_FreeSurface (enemy4);
     SDL_FreeSurface (temp);
+    SDL_FreeSurface (empty);
     TTF_CloseFont (font);
     TTF_Quit();
     SDL_Quit();
-}
-
-int gen_rand ()
-{
-    int x;
-    x = rand ()%4;
-    return x;
 }
 
 int main( int argc, char* args[] )
@@ -109,7 +155,7 @@ int main( int argc, char* args[] )
     Uint32 bad_time = SDL_GetTicks();
     int dx = SCREEN_WIDTH/2; /*Координата x точки*/
     int dy = SCREEN_HEIGHT/2; /*Координата y точки*/
-    float bx,by; /*Координаты пули*/
+    float bx = -100,by = -100; /*Координаты пули*/
     float mx,my; /*Координаты курсора*/
     float xVel, yVel;
     float kVel, b;
@@ -122,33 +168,32 @@ int main( int argc, char* args[] )
         return 1;
     if (load_files()!=1)
         return 1;
-    if (gen_rand () == 0)
-        temp = enemy1;
-    else if (gen_rand () == 1)
-        temp = enemy2;
-    else if (gen_rand () == 2)
-        temp = enemy3;
-    else if (gen_rand () == 3)
-        temp = enemy4;
-    if (gen_rand ()%3 == 0)
+    srand ( (unsigned)time ( NULL ) + 100);
+    switch (rand()%3)
     {
-        ex = SCREEN_WIDTH;
+        case 0: temp = enemy1; break;
+        case 1: temp = enemy2; break;
+        case 2: temp = enemy3; break;
+        case 3: temp = enemy4; break;
+    }
+    switch (rand()%3)
+    {
+        case 0:
+        ex = rand()%SCREEN_WIDTH;
         ey = 0;
-    }
-    else if (gen_rand () == 1)
-    {
+        break;
+        case 1:
         ex = SCREEN_WIDTH;
-        ey = SCREEN_HEIGHT - 20;
-    }
-    else if (gen_rand () == 2)
-    {
+        ey = rand()%SCREEN_HEIGHT;
+        break;
+        case 2:
         ex = 0;
-        ey = SCREEN_HEIGHT;
-    }
-    else if (gen_rand () == 3)
-    {
+        ey = rand()%SCREEN_HEIGHT;
+        break;
+        case 3:
         ex = SCREEN_WIDTH - 20;
-        ey = (SCREEN_HEIGHT);
+        ey = rand()%SCREEN_HEIGHT;
+        break;
     }
     while (quit == 0)
     {
@@ -175,7 +220,7 @@ int main( int argc, char* args[] )
                     {
                         bx = dx + (dot->w)/2;
                         by = dy + (dot->h)/2;;
-                        b=mx*mx + my*my;
+                        b=(mx-bx)*(mx-bx) + (my-by)*(my-by);
                         kVel=sqrt (b);
                         sin=(my-by)/kVel;
                         cos=(mx-bx)/kVel;
@@ -220,14 +265,20 @@ int main( int argc, char* args[] )
         if ((bx>=SCREEN_WIDTH) || (bx <= 0 - bullet->w) || (by >= SCREEN_HEIGHT) || (by <= 0 - bullet->h))
             k=0;
         if (dx < ex)
-            ex=ex-2;
+            ex= ex - 2;
         if (dx > ex)
-            ex=ex+2;
+            ex= ex + 2;
         if (dy < ey)
-            ey=ey-2;
+            ey= ey - 2;
         if (dy > ey)
-            ey= ey+3;
-        if
+            ey= ey + 2;
+        if (check_collision (bullet, temp, bx, by, ex, ey))
+        {
+           bx = -6000;
+           by = -6000;
+           ex = -700;
+           ey = -700;
+        }
         apply_surface (0, 0, background, screen, NULL);
         apply_surface (ex, ey, temp, screen, NULL);
         apply_surface (dx, dy, dot, screen, NULL);
