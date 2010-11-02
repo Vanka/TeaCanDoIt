@@ -133,6 +133,7 @@ int load_files ()
 void set_clips()
 {
 }
+
 void clean_up ()
 {
     SDL_FreeSurface (background);
@@ -169,28 +170,28 @@ int main( int argc, char* args[] )
     if (load_files()!=1)
         return 1;
     srand ( (unsigned)time ( NULL ) + 100);
-    switch (rand()%3)
+    switch (rand()%5)
     {
-        case 0: temp = enemy1; break;
+        case 2: temp = enemy1; break;
         case 1: temp = enemy2; break;
-        case 2: temp = enemy3; break;
+        case 4: temp = enemy3; break;
         case 3: temp = enemy4; break;
     }
-    switch (rand()%3)
+    switch (rand()%5)
     {
-        case 0:
+        case 4:
         ex = rand()%SCREEN_WIDTH;
         ey = 0;
         break;
-        case 1:
+        case 2:
         ex = SCREEN_WIDTH;
         ey = rand()%SCREEN_HEIGHT;
         break;
-        case 2:
+        case 3:
         ex = 0;
         ey = rand()%SCREEN_HEIGHT;
         break;
-        case 3:
+        case 1:
         ex = SCREEN_WIDTH - 20;
         ey = rand()%SCREEN_HEIGHT;
         break;
