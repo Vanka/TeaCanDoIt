@@ -12,7 +12,11 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
+int mx, my;
+int p = 0;
+int n = 1;
 
+SDL_Surface *backmenu=NULL;
 SDL_Surface *background=NULL;
 SDL_Surface *dot=NULL;
 SDL_Surface *temp=NULL;
@@ -113,6 +117,33 @@ int init ()
     SDL_WM_SetIcon (Load_Image ("data/img/icon.bmp"), NULL);
     return 1;
 }
+int menu ()
+{
+    SDL_Surface *message = NULL;
+    SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
+    apply_surface (0, 0, backmenu, screen, NULL);
+    message = TTF_RenderText_Solid ( font, "... (START)", textcolor);
+    apply_surface ((SCREEN_WIDTH - message->w)/2, 60, message, screen, NULL);
+    SDL_FreeSurface (message);
+        SDL_Flip (screen);
+    if (event.type == SDL_MOUSEMOTION)
+    {
+        if (n == 1)
+        {
+            mx = event.motion.x;
+            my = event.motion.y;
+        }
+    }
+    if (event.type == SDL_MOUSEBUTTONDOWN)
+    {
+        if (event.button.button == SDL_BUTTON_LEFT)
+        {
+            if ((mx >= (SCREEN_WIDTH - message->w)/2) && (mx <= (SCREEN_WIDTH - message->w)/2 + message->w) && (my >= 60) && (my <= (60 + message->h)))
+                return 1;
+        }
+    }
+    return 0;
+}
 
 int load_files ()
 {
@@ -168,29 +199,29 @@ int main( int argc, char* args[] )
         return 1;
     if (load_files()!=1)
         return 1;
-    srand ( (unsigned)time ( NULL ) + 100);
-    switch (rand()%3)
+    srand ( (unsigned)time ( NULL ) );
+    switch (rand()%4)
     {
-        case 0: temp = enemy1; break;
+        case 2: temp = enemy1; break;
         case 1: temp = enemy2; break;
-        case 2: temp = enemy3; break;
+        case 0: temp = enemy3; break;
         case 3: temp = enemy4; break;
     }
-    switch (rand()%3)
+    switch (rand()%4)
     {
         case 0:
         ex = rand()%SCREEN_WIDTH;
         ey = 0;
         break;
-        case 1:
+        case 2:
         ex = SCREEN_WIDTH;
         ey = rand()%SCREEN_HEIGHT;
         break;
-        case 2:
+        case 3:
         ex = 0;
         ey = rand()%SCREEN_HEIGHT;
         break;
-        case 3:
+        case 1:
         ex = SCREEN_WIDTH - 20;
         ey = rand()%SCREEN_HEIGHT;
         break;
