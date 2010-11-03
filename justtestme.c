@@ -122,7 +122,7 @@ int load_files ()
     enemy1 = Load_Image ("data/img/enemy1.png");
     enemy2 = Load_Image ("data/img/enemy2.png");
     enemy3 = Load_Image ("data/img/enemy3.png");
-    enemy3 = Load_Image ("data/img/enemy4.png");
+    enemy4 = Load_Image ("data/img/enemy4.png");
     empty = Load_Image ("data/img/empty.png");
     font = TTF_OpenFont ("data/acquestscript.ttf", 36);
     if (background == NULL)
@@ -169,17 +169,17 @@ int main( int argc, char* args[] )
         return 1;
     if (load_files()!=1)
         return 1;
-    srand ( (unsigned)time ( NULL ) + 100);
-    switch (rand()%5)
+    srand ( (unsigned)time ( NULL ));
+    switch (rand()%4)
     {
         case 2: temp = enemy1; break;
         case 1: temp = enemy2; break;
-        case 4: temp = enemy3; break;
+        case 0: temp = enemy3; break;
         case 3: temp = enemy4; break;
     }
-    switch (rand()%5)
+    switch (rand()%4)
     {
-        case 4:
+        case 0:
         ex = rand()%SCREEN_WIDTH;
         ey = 0;
         break;
