@@ -13,6 +13,7 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
+SDL_Surface *message = NULL;
 SDL_Surface *background=NULL;
 SDL_Surface *dot=NULL;
 SDL_Surface *temp=NULL;
@@ -76,22 +77,22 @@ int check_collision(SDL_Surface *A, SDL_Surface *B, int Ax, int Ay, int Bx, int 
     topB = By;
     bottomB = By + B->h;
 
-    if( bottomA <= topB )
+    if ( bottomA <= topB )
     {
         return 0;
     }
 
-    if( topA >= bottomB )
+    if ( topA >= bottomB )
     {
         return 0;
     }
 
-    if( rightA <= leftB )
+    if ( rightA <= leftB )
     {
         return 0;
     }
 
-    if( leftA >= rightB )
+    if ( leftA >= rightB )
     {
         return 0;
     }
@@ -152,6 +153,7 @@ void clean_up ()
 
 int main( int argc, char* args[] )
 {
+    int m;
     Uint32 start=SDL_GetTicks();
     Uint32 bad_time = SDL_GetTicks();
     int dx = SCREEN_WIDTH/2; /*Координата x точки*/
@@ -172,26 +174,34 @@ int main( int argc, char* args[] )
     srand ( (unsigned)time ( NULL ));
     switch (rand()%4)
     {
-        case 2: temp = enemy1; break;
-        case 1: temp = enemy2; break;
-        case 0: temp = enemy3; break;
-        case 3: temp = enemy4; break;
+    case 2:
+        temp = enemy1;
+        break;
+    case 1:
+        temp = enemy2;
+        break;
+    case 0:
+        temp = enemy3;
+        break;
+    case 3:
+        temp = enemy4;
+        break;
     }
     switch (rand()%4)
     {
-        case 0:
+    case 0:
         ex = rand()%SCREEN_WIDTH;
         ey = 0;
         break;
-        case 2:
+    case 2:
         ex = SCREEN_WIDTH;
         ey = rand()%SCREEN_HEIGHT;
         break;
-        case 3:
+    case 3:
         ex = 0;
         ey = rand()%SCREEN_HEIGHT;
         break;
-        case 1:
+    case 1:
         ex = SCREEN_WIDTH - 20;
         ey = rand()%SCREEN_HEIGHT;
         break;
@@ -206,6 +216,8 @@ int main( int argc, char* args[] )
             if (event.type == SDL_KEYDOWN)
             {
                 if (event.key.keysym.sym == SDLK_ESCAPE)
+                    quit = 1;
+                if (m == 1)
                     quit = 1;
             }
             if (event.type == SDL_MOUSEMOTION)
@@ -275,10 +287,18 @@ int main( int argc, char* args[] )
             ey= ey + 2;
         if (check_collision (bullet, temp, bx, by, ex, ey))
         {
-           bx = -6000;
-           by = -6000;
-           ex = -700;
-           ey = -700;
+            bx = -6000;
+            by = -6000;
+            ex = -700;
+            ey = -700;
+        }
+        if (check_collision (dot, temp, dx, dy, ex, ey))
+        {
+            message = TTF_RenderText_Solid (font, "GAME OVER, LOSER", textcolor);
+            apply_surface (0, 0, message, screen, NULL);
+            SDL_Flip(screen);
+            SDL_Delay (4000);
+            quit = 1;
         }
         apply_surface (0, 0, background, screen, NULL);
         apply_surface (ex, ey, temp, screen, NULL);
