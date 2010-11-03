@@ -15,6 +15,7 @@ const int SCREEN_BPP = 32;
 int mx, my;
 int p = 0;
 int n = 1;
+int z = 0;
 
 SDL_Surface *message = NULL;
 SDL_Surface *backmenu=NULL;
@@ -118,38 +119,13 @@ int init ()
     SDL_WM_SetIcon (Load_Image ("data/img/icon.bmp"), NULL);
     return 1;
 }
-int menu ()
-{
-    SDL_Surface *message = NULL;
-    SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
-    apply_surface (0, 0, backmenu, screen, NULL);
-    message = TTF_RenderText_Solid ( font, "... (START)", textcolor);
-    apply_surface ((SCREEN_WIDTH - message->w)/2, 60, message, screen, NULL);
-    SDL_FreeSurface (message);
-        SDL_Flip (screen);
-    if (event.type == SDL_MOUSEMOTION)
-    {
-        if (n == 1)
-        {
-            mx = event.motion.x;
-            my = event.motion.y;
-        }
-    }
-    if (event.type == SDL_MOUSEBUTTONDOWN)
-    {
-        if (event.button.button == SDL_BUTTON_LEFT)
-        {
-            if ((mx >= (SCREEN_WIDTH - message->w)/2) && (mx <= (SCREEN_WIDTH - message->w)/2 + message->w) && (my >= 60) && (my <= (60 + message->h)))
-                return 1;
-        }
-    }
-    return 0;
-}
+
 
 int load_files ()
 {
     background = Load_Image ("data/img/background.png");
     dot = Load_Image ("data/img/dot.png");
+    backmenu = Load_Image("data/img/backmenu.bmp");
     bullet = Load_Image ("data/img/bullet.png");
     enemy1 = Load_Image ("data/img/enemy1.png");
     enemy2 = Load_Image ("data/img/enemy2.png");
@@ -170,20 +146,47 @@ void clean_up ()
 {
     SDL_FreeSurface (background);
     SDL_FreeSurface (dot);
+    SDL_FreeSurface (backmenu);
     SDL_FreeSurface (bullet);
     SDL_FreeSurface (enemy1);
     SDL_FreeSurface (enemy2);
     SDL_FreeSurface (enemy3);
     SDL_FreeSurface (enemy4);
-    SDL_FreeSurface (temp);
     SDL_FreeSurface (empty);
     TTF_CloseFont (font);
     TTF_Quit();
     SDL_Quit();
 }
 
+int menu ()
+{
+    apply_surface (0, 0, backmenu, screen, NULL);
+    message = TTF_RenderText_Solid ( font, "... (START)", textcolor);
+    apply_surface ((SCREEN_WIDTH/2 - message->w/2), (SCREEN_HEIGHT/2 - message->h/2), message, screen, NULL);
+    SDL_Flip (screen);
+    if (event.type == SDL_MOUSEMOTION)
+    {
+        if (n == 1)
+        {
+            mx = event.motion.x;
+            my = event.motion.y;
+        }
+    }
+    if (event.type == SDL_MOUSEBUTTONDOWN)
+    {
+        if (event.button.button == SDL_BUTTON_LEFT)
+        {
+            if ((mx >= (SCREEN_WIDTH - message->w)/2) && (mx <= (SCREEN_WIDTH - message->w)/2 + message->w) && (my >= (SCREEN_HEIGHT - message->h)/2) && (my <= ((SCREEN_HEIGHT - message->h)/2) + message->h))
+                return 1;
+        }
+    }
+    SDL_FreeSurface (message);
+    return 0;
+}
+
 int main( int argc, char* args[] )
 {
+    int check_enemy = 0;
     int m;
     Uint32 start=SDL_GetTicks();
     Uint32 bad_time = SDL_GetTicks();
@@ -202,51 +205,54 @@ int main( int argc, char* args[] )
         return 1;
     if (load_files()!=1)
         return 1;
-    srand ( (unsigned)time ( NULL ));
-    switch (rand()%4)
-    {
-    case 2:
-        temp = enemy1;
-        break;
-    case 1:
-        temp = enemy2;
-        break;
-    case 0:
-        temp = enemy3;
-        break;
-    case 3:
-        temp = enemy4;
-        break;
-    }
     srand ( (unsigned)time ( NULL ) );
-    switch (rand()%4)
-    {
-        case 2: temp = enemy1; break;
-        case 1: temp = enemy2; break;
-        case 0: temp = enemy3; break;
-        case 3: temp = enemy4; break;
-    }
-    switch (rand()%4)
-    {
-    case 0:
-        ex = rand()%SCREEN_WIDTH;
-        ey = 0;
-        break;
-    case 2:
-        ex = SCREEN_WIDTH;
-        ey = rand()%SCREEN_HEIGHT;
-        break;
-    case 3:
-        ex = 0;
-        ey = rand()%SCREEN_HEIGHT;
-        break;
-        case 1:
-        ex = SCREEN_WIDTH - 20;
-        ey = rand()%SCREEN_HEIGHT;
-        break;
-    }
     while (quit == 0)
     {
+        if (check_enemy == 0)
+        {
+            switch (rand()%4)
+            {
+            case 2:
+                temp = enemy1;
+                break;
+            case 1:
+                temp = enemy2;
+                break;
+            case 0:
+                temp = enemy3;
+                break;
+            case 3:
+                temp = enemy4;
+                break;
+            }
+            switch (rand()%4)
+            {
+            case 0:
+                ex = rand()%SCREEN_WIDTH;
+                ey = 0;
+                break;
+            case 2:
+                ex = SCREEN_WIDTH;
+                ey = rand()%SCREEN_HEIGHT;
+                break;
+            case 3:
+                ex = 0;
+                ey = rand()%SCREEN_HEIGHT;
+                break;
+            case 1:
+                ex = SCREEN_WIDTH - 20;
+                ey = rand()%SCREEN_HEIGHT;
+                break;
+            }
+            check_enemy = 1;
+        }
+        if (z == 0)
+        {
+            if (menu() == 1)
+            {
+                z = 1;
+            }
+        }
         start = SDL_GetTicks();
         while (SDL_PollEvent (&event))
         {
@@ -287,63 +293,69 @@ int main( int argc, char* args[] )
         {
             SDL_Delay( ( 1000 / FRAMES_PER_SECOND ) - (SDL_GetTicks()-start) );
         }
-
-        if ((keystates[SDLK_UP]) || (keystates[SDLK_w]))
-            dy -= 3;
-        if ((keystates[SDLK_DOWN]) || (keystates[SDLK_s]))
-            dy += 3;
-        if ((keystates[SDLK_LEFT]) || (keystates[SDLK_a]))
-            dx -= 3;
-        if ((keystates[SDLK_RIGHT]) || (keystates[SDLK_d]))
-            dx += 3;
-        if ( dx <= 0 )
+        if (z == 1)
         {
-            dx = 0;
+            if ((keystates[SDLK_UP]) || (keystates[SDLK_w]))
+                dy -= 3;
+            if ((keystates[SDLK_DOWN]) || (keystates[SDLK_s]))
+                dy += 3;
+            if ((keystates[SDLK_LEFT]) || (keystates[SDLK_a]))
+                dx -= 3;
+            if ((keystates[SDLK_RIGHT]) || (keystates[SDLK_d]))
+                dx += 3;
+            if ( dx <= 0 )
+            {
+                dx = 0;
+            }
+            if ( dx >= SCREEN_WIDTH - dot->w)
+            {
+                dx = SCREEN_WIDTH - dot->w;
+            }
+            if ( dy <= 0 )
+            {
+                dy = 0;
+            }
+            if ( dy >= SCREEN_HEIGHT - dot->h)
+            {
+                dy = SCREEN_HEIGHT - dot->h;
+            }
+            bx+=xVel;
+            by+=yVel;
+            if ((bx>=SCREEN_WIDTH) || (bx <= 0 - bullet->w) || (by >= SCREEN_HEIGHT) || (by <= 0 - bullet->h))
+                k=0;
+            if (dx < ex)
+                ex= ex - 4;
+            if (dx > ex)
+                ex= ex + 4;
+            if (dy < ey)
+                ey= ey - 4;
+            if (dy > ey)
+                ey= ey + 4;
+            if (check_collision (bullet, temp, bx, by, ex, ey))
+            {
+                temp = NULL;
+                check_enemy = 0;
+            }
+            if (temp && check_collision (dot, temp, dx, dy, ex, ey))
+            {
+                message = TTF_RenderText_Solid (font, "GAME OVER, LOSER", textcolor);
+                apply_surface (0, 0, message, screen, NULL);
+                SDL_Flip(screen);
+                SDL_Delay (4000);
+                quit = 1;
+            }
         }
-        if ( dx >= SCREEN_WIDTH - dot->w)
+        if (z == 1)
         {
-            dx = SCREEN_WIDTH - dot->w;
+            apply_surface (0, 0, background, screen, NULL);
+            apply_surface (dx, dy, dot, screen, NULL);
+            if (temp!=NULL)
+            {
+                apply_surface (ex, ey, temp, screen, NULL);
+                apply_surface (bx, by, bullet, screen, NULL);
+            }
+            SDL_Flip (screen);
         }
-        if ( dy <= 0 )
-        {
-            dy = 0;
-        }
-        if ( dy >= SCREEN_HEIGHT - dot->h)
-        {
-            dy = SCREEN_HEIGHT - dot->h;
-        }
-        bx+=xVel;
-        by+=yVel;
-        if ((bx>=SCREEN_WIDTH) || (bx <= 0 - bullet->w) || (by >= SCREEN_HEIGHT) || (by <= 0 - bullet->h))
-            k=0;
-        if (dx < ex)
-            ex= ex - 2;
-        if (dx > ex)
-            ex= ex + 2;
-        if (dy < ey)
-            ey= ey - 2;
-        if (dy > ey)
-            ey= ey + 2;
-        if (check_collision (bullet, temp, bx, by, ex, ey))
-        {
-            bx = -6000;
-            by = -6000;
-            ex = -700;
-            ey = -700;
-        }
-        if (check_collision (dot, temp, dx, dy, ex, ey))
-        {
-            message = TTF_RenderText_Solid (font, "GAME OVER, LOSER", textcolor);
-            apply_surface (0, 0, message, screen, NULL);
-            SDL_Flip(screen);
-            SDL_Delay (4000);
-            quit = 1;
-        }
-        apply_surface (0, 0, background, screen, NULL);
-        apply_surface (ex, ey, temp, screen, NULL);
-        apply_surface (dx, dy, dot, screen, NULL);
-        apply_surface (bx, by, bullet, screen, NULL);
-        SDL_Flip (screen);
     }
     clean_up();
     return 0;
