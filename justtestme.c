@@ -16,7 +16,15 @@ int mx, my;
 int p = 0;
 int n = 1;
 int z = 0;
+int FOO_RIGHT = 0;
+int FOO_LEFT = 1;
+int FOO_UP = 2;
+int FOO_DOWN = 3;
+int FOO_WIDTH = 70;
+int FOO_HEIGHT = 70;
 
+SDL_Rect clipsRight[ 4 ];
+SDL_Rect clipsLeft[ 4 ];
 SDL_Surface *message = NULL;
 SDL_Surface *backmenu=NULL;
 SDL_Surface *background=NULL;
@@ -24,10 +32,6 @@ SDL_Surface *dot=NULL;
 SDL_Surface *temp=NULL;
 SDL_Surface *screen=NULL;
 SDL_Surface *bullet=NULL;
-SDL_Surface *empty;
-SDL_Rect clip_bul;
-SDL_Rect clip_ene [4];
-SDL_Rect clip_dot;
 SDL_Surface *enemy1=NULL;
 SDL_Surface *enemy2=NULL;
 SDL_Surface *enemy3=NULL;
@@ -35,6 +39,8 @@ SDL_Surface *enemy4=NULL;
 SDL_Event event;
 TTF_Font *font=NULL;
 SDL_Color textcolor = {255, 255, 255};
+int status=0;
+int frame=0;
 
 SDL_Surface *Load_Image (char *filename)
 {
@@ -131,15 +137,10 @@ int load_files ()
     enemy2 = Load_Image ("data/img/enemy2.png");
     enemy3 = Load_Image ("data/img/enemy3.png");
     enemy4 = Load_Image ("data/img/enemy4.png");
-    empty = Load_Image ("data/img/empty.png");
     font = TTF_OpenFont ("data/acquestscript.ttf", 36);
     if (background == NULL)
         return 0;
     return 1;
-}
-
-void set_clips()
-{
 }
 
 void clean_up ()
@@ -152,10 +153,53 @@ void clean_up ()
     SDL_FreeSurface (enemy2);
     SDL_FreeSurface (enemy3);
     SDL_FreeSurface (enemy4);
-    SDL_FreeSurface (empty);
     TTF_CloseFont (font);
     TTF_Quit();
     SDL_Quit();
+}
+
+void set_clips()
+{
+    //Clip the sprites
+    clipsRight[ 0 ].x = 0;
+    clipsRight[ 0 ].y = 0;
+    clipsRight[ 0 ].w = FOO_WIDTH;
+    clipsRight[ 0 ].h = FOO_HEIGHT;
+
+    clipsRight[ 1 ].x = FOO_WIDTH;
+    clipsRight[ 1 ].y = 0;
+    clipsRight[ 1 ].w = FOO_WIDTH;
+    clipsRight[ 1 ].h = FOO_HEIGHT;
+
+    clipsRight[ 2 ].x = FOO_WIDTH * 2;
+    clipsRight[ 2 ].y = 0;
+    clipsRight[ 2 ].w = FOO_WIDTH;
+    clipsRight[ 2 ].h = FOO_HEIGHT;
+
+    clipsRight[ 3 ].x = FOO_WIDTH * 3;
+    clipsRight[ 3 ].y = 0;
+    clipsRight[ 3 ].w = FOO_WIDTH;
+    clipsRight[ 3 ].h = FOO_HEIGHT;
+
+    clipsLeft[ 0 ].x = 0;
+    clipsLeft[ 0 ].y = FOO_HEIGHT;
+    clipsLeft[ 0 ].w = FOO_WIDTH;
+    clipsLeft[ 0 ].h = FOO_HEIGHT;
+
+    clipsLeft[ 1 ].x = FOO_WIDTH;
+    clipsLeft[ 1 ].y = FOO_HEIGHT;
+    clipsLeft[ 1 ].w = FOO_WIDTH;
+    clipsLeft[ 1 ].h = FOO_HEIGHT;
+
+    clipsLeft[ 2 ].x = FOO_WIDTH * 2;
+    clipsLeft[ 2 ].y = FOO_HEIGHT;
+    clipsLeft[ 2 ].w = FOO_WIDTH;
+    clipsLeft[ 2 ].h = FOO_HEIGHT;
+
+    clipsLeft[ 3 ].x = FOO_WIDTH * 3;
+    clipsLeft[ 3 ].y = FOO_HEIGHT;
+    clipsLeft[ 3 ].w = FOO_WIDTH;
+    clipsLeft[ 3 ].h = FOO_HEIGHT;
 }
 
 int menu ()
@@ -188,6 +232,8 @@ int main( int argc, char* args[] )
 {
     int check_enemy = 0;
     int m;
+    int scory = 0;
+    char score [10];
     Uint32 start=SDL_GetTicks();
     Uint32 bad_time = SDL_GetTicks();
     int dx = SCREEN_WIDTH/2; /*Координата x точки*/
@@ -199,6 +245,7 @@ int main( int argc, char* args[] )
     float ex,ey; /*Координаты вражины*/
     int k=0;
     float sin,cos;
+    set_clips();
     int quit = 0;
     Uint8 *keystates = SDL_GetKeyState(NULL);
     if (init()!=1)
@@ -276,8 +323,8 @@ int main( int argc, char* args[] )
                 {
                     if (k==0)
                     {
-                        bx = dx + (dot->w)/2;
-                        by = dy + (dot->h)/2;;
+                        bx = dx + 45;
+                        by = dy + 45;
                         b=(mx-bx)*(mx-bx) + (my-by)*(my-by);
                         kVel=sqrt (b);
                         sin=(my-by)/kVel;
@@ -296,28 +343,48 @@ int main( int argc, char* args[] )
         if (z == 1)
         {
             if ((keystates[SDLK_UP]) || (keystates[SDLK_w]))
+            {
                 dy -= 3;
+                status = FOO_UP;
+                frame++;
+            }
             if ((keystates[SDLK_DOWN]) || (keystates[SDLK_s]))
+            {
                 dy += 3;
+                status = FOO_DOWN;
+                frame++;
+            }
             if ((keystates[SDLK_LEFT]) || (keystates[SDLK_a]))
+            {
                 dx -= 3;
+                status = FOO_LEFT;
+                frame++;
+            }
             if ((keystates[SDLK_RIGHT]) || (keystates[SDLK_d]))
+            {
                 dx += 3;
+                status = FOO_RIGHT;
+                frame++;
+            }
+             else
+            {
+                frame = 0;
+            }
             if ( dx <= 0 )
             {
                 dx = 0;
             }
-            if ( dx >= SCREEN_WIDTH - dot->w)
+            if ( dx >= SCREEN_WIDTH - 70)
             {
-                dx = SCREEN_WIDTH - dot->w;
+                dx = SCREEN_WIDTH - 70;
             }
             if ( dy <= 0 )
             {
                 dy = 0;
             }
-            if ( dy >= SCREEN_HEIGHT - dot->h)
+            if ( dy >= SCREEN_HEIGHT - 70)
             {
-                dy = SCREEN_HEIGHT - dot->h;
+                dy = SCREEN_HEIGHT - 70;
             }
             bx+=xVel;
             by+=yVel;
@@ -334,22 +401,32 @@ int main( int argc, char* args[] )
             if (check_collision (bullet, temp, bx, by, ex, ey))
             {
                 temp = NULL;
+                bx = -874; by = -972;
                 check_enemy = 0;
+                scory +=10;
             }
-            if (temp && check_collision (dot, temp, dx, dy, ex, ey))
-            {
-                message = TTF_RenderText_Solid (font, "GAME OVER, LOSER", textcolor);
-                apply_surface (0, 0, message, screen, NULL);
-                SDL_Flip(screen);
-                SDL_Delay (4000);
-                quit = 1;
-            }
+
+        }
+        if( frame >= 4 )
+        {
+            frame = 0;
         }
         if (z == 1)
         {
+            snprintf (score, sizeof (score), "%d", scory);
+            message = TTF_RenderText_Solid (font, score, textcolor);
             apply_surface (0, 0, background, screen, NULL);
-            apply_surface (dx, dy, dot, screen, NULL);
-            if (temp!=NULL)
+            if( status == FOO_RIGHT )
+            {
+                apply_surface( dx, dy, dot, screen, &clipsRight[ frame ] );
+            }
+            else if( status == FOO_LEFT )
+            {
+                apply_surface( dx, dy, dot, screen, &clipsLeft[ frame ] );
+            }
+            apply_surface (SCREEN_WIDTH - message->w, 0, message, screen, NULL);
+            SDL_FreeSurface (message);
+            if (temp != NULL)
             {
                 apply_surface (ex, ey, temp, screen, NULL);
                 apply_surface (bx, by, bullet, screen, NULL);
