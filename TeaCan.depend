@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1288777137 source:d:\gogo\justtestme.c
+	"SDL/SDL.h"
+	"SDL/SDL_image.h"
+	<stdio.h>
+	"SDL/SDL_ttf.h"
+	"SDL/SDL_mixer.h"
+	<math.h>
+	<stdlib.h>
+	<time.h>
+
