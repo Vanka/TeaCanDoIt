@@ -20,7 +20,6 @@ int FOO_RIGHT = 0;
 int FOO_LEFT = 1;
 int FOO_UP = 2;
 int FOO_DOWN = 3;
-<<<<<<< HEAD
 int FOO_WIDTH = 30;
 int FOO_HEIGHT = 30;
 
@@ -28,13 +27,10 @@ SDL_Rect clipsRight[ 4 ];
 SDL_Rect clipsLeft[ 4 ];
 SDL_Rect clipsUp [ 4 ];
 SDL_Rect clipsDown [ 4 ];
-=======
-int FOO_WIDTH = 70;
-int FOO_HEIGHT = 70;
 
 SDL_Rect clipsRight[ 4 ];
 SDL_Rect clipsLeft[ 4 ];
->>>>>>> origin/some
+
 SDL_Surface *message = NULL;
 SDL_Surface *backmenu=NULL;
 SDL_Surface *background=NULL;
@@ -210,7 +206,7 @@ void set_clips()
     clipsLeft[ 3 ].y = FOO_HEIGHT;
     clipsLeft[ 3 ].w = FOO_WIDTH;
     clipsLeft[ 3 ].h = FOO_HEIGHT;
-<<<<<<< HEAD
+
 
     clipsUp[ 0 ].x = 0;
     clipsUp[ 0 ].y = FOO_HEIGHT * 2;
@@ -251,8 +247,7 @@ void set_clips()
     clipsDown[ 3 ].y = FOO_HEIGHT * 3;
     clipsDown[ 3 ].w = FOO_WIDTH;
     clipsDown[ 3 ].h = FOO_HEIGHT;
-=======
->>>>>>> origin/some
+
 }
 
 int menu ()
@@ -375,13 +370,13 @@ int main( int argc, char* args[] )
                 {
                     if (k==0)
                     {
-<<<<<<< HEAD
+
                         bx = dx + 10;
                         by = dy + 10;
-=======
+
                         bx = dx + 45;
                         by = dy + 45;
->>>>>>> origin/some
+
                         b=(mx-bx)*(mx-bx) + (my-by)*(my-by);
                         kVel=sqrt (b);
                         sin=(my-by)/kVel;
@@ -403,38 +398,38 @@ int main( int argc, char* args[] )
             {
                 dy -= 3;
                 status = FOO_UP;
-<<<<<<< HEAD
+
                 if (dy % 5 == 0)
                     frame++;
-=======
+
                 frame++;
->>>>>>> origin/some
+
             }
             if ((keystates[SDLK_DOWN]) || (keystates[SDLK_s]))
             {
                 dy += 3;
                 status = FOO_DOWN;
-<<<<<<< HEAD
+
                 if (dy % 5 == 0)
-=======
->>>>>>> origin/some
+
+
                 frame++;
             }
             if ((keystates[SDLK_LEFT]) || (keystates[SDLK_a]))
             {
                 dx -= 3;
                 status = FOO_LEFT;
-<<<<<<< HEAD
+
                 if (dx % 5 == 0)
-=======
->>>>>>> origin/some
+
+
                 frame++;
             }
             if ((keystates[SDLK_RIGHT]) || (keystates[SDLK_d]))
             {
                 dx += 3;
                 status = FOO_RIGHT;
-<<<<<<< HEAD
+
                 if (dx % 5 == 0)
                 frame++;
             }
@@ -457,7 +452,7 @@ int main( int argc, char* args[] )
             if ( dy >= SCREEN_HEIGHT + 10)
             {
                 dy = - 9;
-=======
+
                 frame++;
             }
              else
@@ -476,25 +471,25 @@ int main( int argc, char* args[] )
             {
                 dy = 0;
             }
-            if ( dy >= SCREEN_HEIGHT - 70)
+            if ( dy >= SCREEN_HEIGHT - 10)
             {
-                dy = SCREEN_HEIGHT - 70;
->>>>>>> origin/some
+                dy = SCREEN_HEIGHT - 10;
+
             }
             bx+=xVel;
             by+=yVel;
             if ((bx>=SCREEN_WIDTH) || (bx <= 0 - bullet->w) || (by >= SCREEN_HEIGHT) || (by <= 0 - bullet->h))
                 k=0;
             if (dx < ex)
-<<<<<<< HEAD
-                ex= ex - 6;
+
+                ex= ex - 3;
             if (dx > ex)
                 ex= ex + 6;
             if (dy < ey)
                 ey= ey - 6;
             if (dy > ey)
                 ey= ey + 6;
-=======
+
                 ex= ex - 4;
             if (dx > ex)
                 ex= ex + 4;
@@ -502,7 +497,7 @@ int main( int argc, char* args[] )
                 ey= ey - 4;
             if (dy > ey)
                 ey= ey + 4;
->>>>>>> origin/some
+
             if (check_collision (bullet, temp, bx, by, ex, ey))
             {
                 temp = NULL;
@@ -511,13 +506,13 @@ int main( int argc, char* args[] )
                 scory +=10;
             }
 
-<<<<<<< HEAD
-=======
+
+
         }
         if( frame >= 4 )
         {
             frame = 0;
->>>>>>> origin/some
+
         }
         if (z == 1)
         {
@@ -532,7 +527,7 @@ int main( int argc, char* args[] )
             {
                 apply_surface( dx, dy, dot, screen, &clipsLeft[ frame ] );
             }
-<<<<<<< HEAD
+
             else if( status == FOO_UP )
             {
                 apply_surface( dx, dy, dot, screen, &clipsUp[ frame ] );
@@ -541,8 +536,7 @@ int main( int argc, char* args[] )
             {
                 apply_surface( dx, dy, dot, screen, &clipsDown[ frame ] );
             }
-=======
->>>>>>> origin/some
+
             apply_surface (SCREEN_WIDTH - message->w, 0, message, screen, NULL);
             SDL_FreeSurface (message);
             if (temp != NULL)
