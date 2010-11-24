@@ -76,19 +76,19 @@ void apply_surface (int x, int y, SDL_Surface *source, SDL_Surface *destination,
 
 int check_collision(SDL_Surface *A, SDL_Surface *B, int Ax, int Ay, int Bx, int By)
 {
-    //The sides of the rectangles
+
     int leftA, leftB;
     int rightA, rightB;
     int topA, topB;
     int bottomA, bottomB;
 
-    //Calculate the sides of rect A
+
     leftA = Ax;
     rightA = Ax + A->w;
     topA = Ay;
     bottomA = Ay + A->h;
 
-    //Calculate the sides of rect B
+
     leftB = Bx;
     rightB = Bx + B->w;
     topB = By;
@@ -114,7 +114,7 @@ int check_collision(SDL_Surface *A, SDL_Surface *B, int Ax, int Ay, int Bx, int 
         return 0;
     }
 
-    //If none of the sides from A are outside B
+
     return 1;
 }
 
@@ -166,7 +166,7 @@ void clean_up ()
 
 void set_clips()
 {
-    //Clip the sprites
+
     clipsRight[ 0 ].x = 0;
     clipsRight[ 0 ].y = 0;
     clipsRight[ 0 ].w = FOO_WIDTH;
@@ -373,10 +373,6 @@ int main( int argc, char* args[] )
 
                         bx = dx + 10;
                         by = dy + 10;
-
-                        bx = dx + 45;
-                        by = dy + 45;
-
                         b=(mx-bx)*(mx-bx) + (my-by)*(my-by);
                         kVel=sqrt (b);
                         sin=(my-by)/kVel;
@@ -398,32 +394,22 @@ int main( int argc, char* args[] )
             {
                 dy -= 3;
                 status = FOO_UP;
-
                 if (dy % 5 == 0)
                     frame++;
-
-                frame++;
-
             }
             if ((keystates[SDLK_DOWN]) || (keystates[SDLK_s]))
             {
                 dy += 3;
                 status = FOO_DOWN;
-
                 if (dy % 5 == 0)
-
-
-                frame++;
+                    frame++;
             }
             if ((keystates[SDLK_LEFT]) || (keystates[SDLK_a]))
             {
                 dx -= 3;
                 status = FOO_LEFT;
-
                 if (dx % 5 == 0)
-
-
-                frame++;
+                    frame++;
             }
             if ((keystates[SDLK_RIGHT]) || (keystates[SDLK_d]))
             {
@@ -452,52 +438,19 @@ int main( int argc, char* args[] )
             if ( dy >= SCREEN_HEIGHT + 10)
             {
                 dy = - 9;
-
-                frame++;
-            }
-             else
-            {
-                frame = 0;
-            }
-            if ( dx <= 0 )
-            {
-                dx = 0;
-            }
-            if ( dx >= SCREEN_WIDTH - 70)
-            {
-                dx = SCREEN_WIDTH - 70;
-            }
-            if ( dy <= 0 )
-            {
-                dy = 0;
-            }
-            if ( dy >= SCREEN_HEIGHT - 10)
-            {
-                dy = SCREEN_HEIGHT - 10;
-
             }
             bx+=xVel;
             by+=yVel;
             if ((bx>=SCREEN_WIDTH) || (bx <= 0 - bullet->w) || (by >= SCREEN_HEIGHT) || (by <= 0 - bullet->h))
                 k=0;
             if (dx < ex)
-
                 ex= ex - 3;
             if (dx > ex)
-                ex= ex + 6;
+                ex= ex + 3;
             if (dy < ey)
-                ey= ey - 6;
+                ey= ey - 3;
             if (dy > ey)
-                ey= ey + 6;
-
-                ex= ex - 4;
-            if (dx > ex)
-                ex= ex + 4;
-            if (dy < ey)
-                ey= ey - 4;
-            if (dy > ey)
-                ey= ey + 4;
-
+                ey= ey + 3;
             if (check_collision (bullet, temp, bx, by, ex, ey))
             {
                 temp = NULL;
