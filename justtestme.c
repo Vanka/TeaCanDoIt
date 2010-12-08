@@ -76,24 +76,25 @@ void apply_surface (int x, int y, SDL_Surface *source, SDL_Surface *destination,
 
 int check_collision(SDL_Surface *A, SDL_Surface *B, int Ax, int Ay, int Bx, int By)
 {
-
+    //The sides of the rectangles
     int leftA, leftB;
     int rightA, rightB;
     int topA, topB;
     int bottomA, bottomB;
 
-
+    //Calculate the sides of rect A
     leftA = Ax;
     rightA = Ax + A->w;
     topA = Ay;
     bottomA = Ay + A->h;
 
-
+    //Calculate the sides of rect B
     leftB = Bx;
     rightB = Bx + B->w;
     topB = By;
     bottomB = By + B->h;
 
+    //If none of the sides from A are outside B
     if ( bottomA <= topB )
     {
         return 0;
@@ -163,6 +164,8 @@ void clean_up ()
     TTF_Quit();
     SDL_Quit();
 }
+
+    //Clip the sprites
 
 void set_clips()
 {
