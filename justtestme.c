@@ -12,7 +12,7 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
-int mx, my;
+float mx, my;
 int p = 0;
 int n = 1;
 int z = 0;
@@ -20,11 +20,16 @@ int FOO_RIGHT = 0;
 int FOO_LEFT = 1;
 int FOO_UP = 2;
 int FOO_DOWN = 3;
-int FOO_WIDTH = 70;
-int FOO_HEIGHT = 70;
+int FOO_WIDTH = 20;
+int FOO_HEIGHT = 20;
+int audio_rate = 22050;
+Uint16 audio_format = AUDIO_S16;
+int audio_channels = 2;
+int audio_buffers = 4096;
 
 SDL_Rect clipsRight[ 4 ];
 SDL_Rect clipsLeft[ 4 ];
+Mix_Music *music=NULL;
 SDL_Surface *message = NULL;
 SDL_Surface *backmenu=NULL;
 SDL_Surface *background=NULL;
@@ -121,6 +126,10 @@ int init ()
         return 0;
     if (TTF_Init() == -1)
         return 0;
+    if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
+        return 0;
+    if (Mix_Init(MIX_INIT_MP3) == -1)
+        return 0;
     SDL_WM_SetCaption (">_<", "data/img/icon.bmp");
     SDL_WM_SetIcon (Load_Image ("data/img/icon.bmp"), NULL);
     return 1;
@@ -129,6 +138,7 @@ int init ()
 
 int load_files ()
 {
+    music = Mix_LoadMUS ("data/music/Liberate.mp3");
     background = Load_Image ("data/img/background.png");
     dot = Load_Image ("data/img/dot.png");
     backmenu = Load_Image("data/img/backmenu.bmp");
@@ -145,6 +155,7 @@ int load_files ()
 
 void clean_up ()
 {
+    Mix_FreeMusic (music);
     SDL_FreeSurface (background);
     SDL_FreeSurface (dot);
     SDL_FreeSurface (backmenu);
@@ -153,9 +164,11 @@ void clean_up ()
     SDL_FreeSurface (enemy2);
     SDL_FreeSurface (enemy3);
     SDL_FreeSurface (enemy4);
+    Mix_CloseAudio();
     TTF_CloseFont (font);
     TTF_Quit();
     SDL_Quit();
+    Mix_Quit();
 }
 
 void set_clips()
@@ -205,24 +218,29 @@ void set_clips()
 int menu ()
 {
     apply_surface (0, 0, backmenu, screen, NULL);
-    message = TTF_RenderText_Solid ( font, "... (START)", textcolor);
+    message = TTF_RenderText_Solid ( font, "Start", textcolor);
     apply_surface ((SCREEN_WIDTH/2 - message->w/2), (SCREEN_HEIGHT/2 - message->h/2), message, screen, NULL);
+    SDL_FreeSurface(message);
+    message = TTF_RenderText_Solid ( font, "Exit", textcolor);
+    apply_surface ((SCREEN_WIDTH/2 - message->w/2), (SCREEN_HEIGHT - message->h), message, screen, NULL);
     SDL_Flip (screen);
     if (event.type == SDL_MOUSEMOTION)
     {
         if (n == 1)
         {
             mx = event.motion.x;
-            my = event.motion.y;
+                my = event.motion.y;
         }
     }
-    if (event.type == SDL_MOUSEBUTTONDOWN)
-    {
-        if (event.button.button == SDL_BUTTON_LEFT)
+        if (event.type == SDL_MOUSEBUTTONDOWN)
         {
-            if ((mx >= (SCREEN_WIDTH - message->w)/2) && (mx <= (SCREEN_WIDTH - message->w)/2 + message->w) && (my >= (SCREEN_HEIGHT - message->h)/2) && (my <= ((SCREEN_HEIGHT - message->h)/2) + message->h))
-                return 1;
-        }
+            if (event.button.button == SDL_BUTTON_LEFT)
+            {
+                if ((mx >= (SCREEN_WIDTH - message->w)/2) && (mx <= (SCREEN_WIDTH - message->w)/2 + message->w) && (my >= (SCREEN_HEIGHT - message->h)/2) && (my <= ((SCREEN_HEIGHT - message->h)/2) + message->h))
+                    return 1;
+                if ((mx >= (SCREEN_WIDTH - message->w)/2) && (mx <= (SCREEN_WIDTH - message->w)/2 + message->w) && (my >= (SCREEN_HEIGHT - message->h)) && (my <= ((SCREEN_HEIGHT - message->h)+ message->h)))
+                    return 2;
+            }
     }
     SDL_FreeSurface (message);
     return 0;
@@ -240,18 +258,20 @@ int main( int argc, char* args[] )
     int dy = SCREEN_HEIGHT/2; /*Координата y точки*/
     float bx = -100,by = -100; /*Координаты пули*/
     float mx,my; /*Координаты курсора*/
-    float xVel, yVel;
+    float xVel, yVel, exVel, eyVel;
     float kVel, b;
     float ex,ey; /*Координаты вражины*/
     int k=0;
     float sin,cos;
-    set_clips();
     int quit = 0;
     Uint8 *keystates = SDL_GetKeyState(NULL);
+    set_clips();
     if (init()!=1)
         return 1;
     if (load_files()!=1)
         return 1;
+    music = Mix_LoadMUS("data/music/Liberate.mp3");
+    Mix_PlayMusic (music, 0);
     srand ( (unsigned)time ( NULL ) );
     while (quit == 0)
     {
@@ -294,9 +314,14 @@ int main( int argc, char* args[] )
             check_enemy = 1;
         }
         if (z == 0)
+
         {
+
+            if (menu() == 2)
+                quit = 1;
             if (menu() == 1)
             {
+                Mix_HaltMusic();
                 z = 1;
             }
         }
@@ -323,8 +348,8 @@ int main( int argc, char* args[] )
                 {
                     if (k==0)
                     {
-                        bx = dx + 45;
-                        by = dy + 45;
+                        bx = dx + 10;
+                        by = dy + 10;
                         b=(mx-bx)*(mx-bx) + (my-by)*(my-by);
                         kVel=sqrt (b);
                         sin=(my-by)/kVel;
@@ -345,28 +370,32 @@ int main( int argc, char* args[] )
             if ((keystates[SDLK_UP]) || (keystates[SDLK_w]))
             {
                 dy -= 3;
-                status = FOO_UP;
+                status = FOO_RIGHT;
                 frame++;
             }
-            if ((keystates[SDLK_DOWN]) || (keystates[SDLK_s]))
+            else if ((keystates[SDLK_DOWN]) || (keystates[SDLK_s]))
             {
                 dy += 3;
-                status = FOO_DOWN;
+                status = FOO_LEFT;
                 frame++;
             }
-            if ((keystates[SDLK_LEFT]) || (keystates[SDLK_a]))
+            else if ((keystates[SDLK_LEFT]) || (keystates[SDLK_a]))
             {
                 dx -= 3;
                 status = FOO_LEFT;
                 frame++;
             }
-            if ((keystates[SDLK_RIGHT]) || (keystates[SDLK_d]))
+            else if ((keystates[SDLK_RIGHT]) || (keystates[SDLK_d]))
             {
                 dx += 3;
                 status = FOO_RIGHT;
                 frame++;
             }
-             else
+            else
+            {
+                frame = 0;
+            }
+            if ( frame >= 3 )
             {
                 frame = 0;
             }
@@ -374,53 +403,50 @@ int main( int argc, char* args[] )
             {
                 dx = 0;
             }
-            if ( dx >= SCREEN_WIDTH - 70)
+            if ( dx >= SCREEN_WIDTH - 20)
             {
-                dx = SCREEN_WIDTH - 70;
+                dx = SCREEN_WIDTH - 20;
             }
             if ( dy <= 0 )
             {
                 dy = 0;
             }
-            if ( dy >= SCREEN_HEIGHT - 70)
+            if ( dy >= SCREEN_HEIGHT - 20)
             {
-                dy = SCREEN_HEIGHT - 70;
+                dy = SCREEN_HEIGHT - 20;
             }
             bx+=xVel;
             by+=yVel;
             if ((bx>=SCREEN_WIDTH) || (bx <= 0 - bullet->w) || (by >= SCREEN_HEIGHT) || (by <= 0 - bullet->h))
                 k=0;
             if (dx < ex)
-                ex= ex - 4;
-            if (dx > ex)
-                ex= ex + 4;
-            if (dy < ey)
-                ey= ey - 4;
-            if (dy > ey)
-                ey= ey + 4;
+                kVel=sqrt ((dx-ex)*(dx-ex) + (dy-ey)*(dy-ey));
+            sin=(dy-ey)/kVel;
+            cos=(dx-ex)/kVel;
+            eyVel=sin*5;
+            exVel=cos*5;
+            ex+=exVel;
+            ey+=eyVel;
             if (check_collision (bullet, temp, bx, by, ex, ey))
             {
                 temp = NULL;
-                bx = -874; by = -972;
+                bx = -874;
+                by = -972;
                 check_enemy = 0;
                 scory +=10;
             }
 
-        }
-        if( frame >= 4 )
-        {
-            frame = 0;
         }
         if (z == 1)
         {
             snprintf (score, sizeof (score), "%d", scory);
             message = TTF_RenderText_Solid (font, score, textcolor);
             apply_surface (0, 0, background, screen, NULL);
-            if( status == FOO_RIGHT )
+            if ( status == FOO_RIGHT )
             {
                 apply_surface( dx, dy, dot, screen, &clipsRight[ frame ] );
             }
-            else if( status == FOO_LEFT )
+            else if ( status == FOO_LEFT )
             {
                 apply_surface( dx, dy, dot, screen, &clipsLeft[ frame ] );
             }
