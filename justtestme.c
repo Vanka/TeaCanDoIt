@@ -20,6 +20,7 @@ int FOO_RIGHT = 0;
 int FOO_LEFT = 1;
 int FOO_UP = 2;
 int FOO_DOWN = 3;
+<<<<<<< HEAD
 int FOO_WIDTH = 20;
 int FOO_HEIGHT = 20;
 int audio_rate = 22050;
@@ -30,6 +31,19 @@ int audio_buffers = 4096;
 SDL_Rect clipsRight[ 4 ];
 SDL_Rect clipsLeft[ 4 ];
 Mix_Music *music=NULL;
+=======
+int FOO_WIDTH = 30;
+int FOO_HEIGHT = 30;
+
+SDL_Rect clipsRight[ 4 ];
+SDL_Rect clipsLeft[ 4 ];
+SDL_Rect clipsUp [ 4 ];
+SDL_Rect clipsDown [ 4 ];
+
+SDL_Rect clipsRight[ 4 ];
+SDL_Rect clipsLeft[ 4 ];
+
+>>>>>>> origin/some
 SDL_Surface *message = NULL;
 SDL_Surface *backmenu=NULL;
 SDL_Surface *background=NULL;
@@ -93,6 +107,7 @@ int check_collision(SDL_Surface *A, SDL_Surface *B, int Ax, int Ay, int Bx, int 
     topB = By;
     bottomB = By + B->h;
 
+    //If none of the sides from A are outside B
     if ( bottomA <= topB )
     {
         return 0;
@@ -113,7 +128,7 @@ int check_collision(SDL_Surface *A, SDL_Surface *B, int Ax, int Ay, int Bx, int 
         return 0;
     }
 
-    //If none of the sides from A are outside B
+
     return 1;
 }
 
@@ -171,9 +186,11 @@ void clean_up ()
     Mix_Quit();
 }
 
+    //Clip the sprites
+
 void set_clips()
 {
-    //Clip the sprites
+
     clipsRight[ 0 ].x = 0;
     clipsRight[ 0 ].y = 0;
     clipsRight[ 0 ].w = FOO_WIDTH;
@@ -213,6 +230,48 @@ void set_clips()
     clipsLeft[ 3 ].y = FOO_HEIGHT;
     clipsLeft[ 3 ].w = FOO_WIDTH;
     clipsLeft[ 3 ].h = FOO_HEIGHT;
+
+
+    clipsUp[ 0 ].x = 0;
+    clipsUp[ 0 ].y = FOO_HEIGHT * 2;
+    clipsUp[ 0 ].w = FOO_WIDTH;
+    clipsUp[ 0 ].h = FOO_HEIGHT;
+
+    clipsUp[ 1 ].x = FOO_WIDTH;
+    clipsUp[ 1 ].y = FOO_HEIGHT * 2;
+    clipsUp[ 1 ].w = FOO_WIDTH;
+    clipsUp[ 1 ].h = FOO_HEIGHT;
+
+    clipsUp[ 2 ].x = FOO_WIDTH * 2;
+    clipsUp[ 2 ].y = FOO_HEIGHT * 2;
+    clipsUp[ 2 ].w = FOO_WIDTH;
+    clipsUp[ 2 ].h = FOO_HEIGHT;
+
+    clipsUp[ 3 ].x = FOO_WIDTH * 3;
+    clipsUp[ 3 ].y = FOO_HEIGHT * 2;
+    clipsUp[ 3 ].w = FOO_WIDTH;
+    clipsUp[ 3 ].h = FOO_HEIGHT;
+
+    clipsDown[ 0 ].x = 0;
+    clipsDown[ 0 ].y = FOO_HEIGHT * 3;
+    clipsDown[ 0 ].w = FOO_WIDTH;
+    clipsDown[ 0 ].h = FOO_HEIGHT;
+
+    clipsDown[ 1 ].x = FOO_WIDTH ;
+    clipsDown[ 1 ].y = FOO_HEIGHT * 3;
+    clipsDown[ 1 ].w = FOO_WIDTH;
+    clipsDown[ 1 ].h = FOO_HEIGHT;
+
+    clipsDown[ 2 ].x = FOO_WIDTH * 2;
+    clipsDown[ 2 ].y = FOO_HEIGHT * 3;
+    clipsDown[ 2 ].w = FOO_WIDTH;
+    clipsDown[ 2 ].h = FOO_HEIGHT;
+
+    clipsDown[ 3 ].x = FOO_WIDTH * 3;
+    clipsDown[ 3 ].y = FOO_HEIGHT * 3;
+    clipsDown[ 3 ].w = FOO_WIDTH;
+    clipsDown[ 3 ].h = FOO_HEIGHT;
+
 }
 
 int menu ()
@@ -253,7 +312,6 @@ int main( int argc, char* args[] )
     int scory = 0;
     char score [10];
     Uint32 start=SDL_GetTicks();
-    Uint32 bad_time = SDL_GetTicks();
     int dx = SCREEN_WIDTH/2; /*Координата x точки*/
     int dy = SCREEN_HEIGHT/2; /*Координата y точки*/
     float bx = -100,by = -100; /*Координаты пули*/
@@ -348,6 +406,10 @@ int main( int argc, char* args[] )
                 {
                     if (k==0)
                     {
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/some
                         bx = dx + 10;
                         by = dy + 10;
                         b=(mx-bx)*(mx-bx) + (my-by)*(my-by);
@@ -370,56 +432,88 @@ int main( int argc, char* args[] )
             if ((keystates[SDLK_UP]) || (keystates[SDLK_w]))
             {
                 dy -= 3;
+<<<<<<< HEAD
                 status = FOO_RIGHT;
                 frame++;
+=======
+                status = FOO_UP;
+                if (dy % 5 == 0)
+                    frame++;
+>>>>>>> origin/some
             }
             else if ((keystates[SDLK_DOWN]) || (keystates[SDLK_s]))
             {
                 dy += 3;
+<<<<<<< HEAD
                 status = FOO_LEFT;
                 frame++;
+=======
+                status = FOO_DOWN;
+                if (dy % 5 == 0)
+                    frame++;
+>>>>>>> origin/some
             }
             else if ((keystates[SDLK_LEFT]) || (keystates[SDLK_a]))
             {
                 dx -= 3;
                 status = FOO_LEFT;
-                frame++;
+                if (dx % 5 == 0)
+                    frame++;
             }
             else if ((keystates[SDLK_RIGHT]) || (keystates[SDLK_d]))
             {
                 dx += 3;
                 status = FOO_RIGHT;
+
+                if (dx % 5 == 0)
                 frame++;
             }
+<<<<<<< HEAD
             else
             {
                 frame = 0;
             }
             if ( frame >= 3 )
+=======
+            if( frame >= 3 )
+>>>>>>> origin/some
             {
                 frame = 0;
             }
-            if ( dx <= 0 )
+            if ( dx <= -9 )
             {
-                dx = 0;
+                dx = SCREEN_WIDTH - 9;
             }
+<<<<<<< HEAD
             if ( dx >= SCREEN_WIDTH - 20)
             {
                 dx = SCREEN_WIDTH - 20;
-            }
-            if ( dy <= 0 )
+=======
+            if ( dx >= SCREEN_WIDTH + 10)
             {
-                dy = 0;
+                dx = -9;
+>>>>>>> origin/some
             }
+            if ( dy <= -10 )
+            {
+                dy = SCREEN_HEIGHT - 9;
+            }
+<<<<<<< HEAD
             if ( dy >= SCREEN_HEIGHT - 20)
             {
                 dy = SCREEN_HEIGHT - 20;
+=======
+            if ( dy >= SCREEN_HEIGHT + 10)
+            {
+                dy = - 9;
+>>>>>>> origin/some
             }
             bx+=xVel;
             by+=yVel;
             if ((bx>=SCREEN_WIDTH) || (bx <= 0 - bullet->w) || (by >= SCREEN_HEIGHT) || (by <= 0 - bullet->h))
                 k=0;
             if (dx < ex)
+<<<<<<< HEAD
                 kVel=sqrt ((dx-ex)*(dx-ex) + (dy-ey)*(dy-ey));
             sin=(dy-ey)/kVel;
             cos=(dx-ex)/kVel;
@@ -427,6 +521,15 @@ int main( int argc, char* args[] )
             exVel=cos*5;
             ex+=exVel;
             ey+=eyVel;
+=======
+                ex= ex - 3;
+            if (dx > ex)
+                ex= ex + 3;
+            if (dy < ey)
+                ey= ey - 3;
+            if (dy > ey)
+                ey= ey + 3;
+>>>>>>> origin/some
             if (check_collision (bullet, temp, bx, by, ex, ey))
             {
                 temp = NULL;
@@ -436,7 +539,17 @@ int main( int argc, char* args[] )
                 scory +=10;
             }
 
+
+
         }
+<<<<<<< HEAD
+=======
+        if( frame >= 4 )
+        {
+            frame = 0;
+
+        }
+>>>>>>> origin/some
         if (z == 1)
         {
             snprintf (score, sizeof (score), "%d", scory);
@@ -450,6 +563,16 @@ int main( int argc, char* args[] )
             {
                 apply_surface( dx, dy, dot, screen, &clipsLeft[ frame ] );
             }
+
+            else if( status == FOO_UP )
+            {
+                apply_surface( dx, dy, dot, screen, &clipsUp[ frame ] );
+            }
+            else if( status == FOO_DOWN )
+            {
+                apply_surface( dx, dy, dot, screen, &clipsDown[ frame ] );
+            }
+
             apply_surface (SCREEN_WIDTH - message->w, 0, message, screen, NULL);
             SDL_FreeSurface (message);
             if (temp != NULL)
