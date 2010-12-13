@@ -29,6 +29,7 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-pedantic" />
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="justtestme.c">
